@@ -1,11 +1,8 @@
-import csv
 import random
 import pygame
 import time
-import xlsxwriter
 
 def start_point_generate(n, m):
-    """Функция выбора точки начала лабиринта"""
     if random.choice([True, False]):
         if random.choice([True, False]):
             start = (0, random.randint(0, m - 1))
@@ -20,12 +17,10 @@ def start_point_generate(n, m):
 
 
 def finish_point_generate(start, n, m):
-    """Выбор точки конца лабиринта"""
     return n - 1 - start[0], m - 1 - start[1]
 
 
 def transition_choice(x, y, rm):
-    """Функция выбора дальнейшего пути в генерации лабиринта"""
     choice_list = []
     if x > 0:
         if not rm[x - 1][y]:
@@ -57,7 +52,6 @@ def transition_choice(x, y, rm):
 
 
 def create_labyrinth(n=5, m=5):
-    """Генерация лабиринта"""
     reach_matrix = []
     for i in range(n):  # создаём матрицу достижимости ячеек
         reach_matrix.append([])
@@ -90,9 +84,8 @@ def create_labyrinth(n=5, m=5):
 
 
 def draw_labyrinth(matrix, start, finish, width_line=20, width_walls=5, color_way=(255, 255, 255),
-                   color_wall=(0, 0, 0),
-                   border=5, color_start=(0, 255, 0), color_finish=(255, 0, 0)):
-    """Рисование лабиринта"""
+                   color_wall=(0,0,0),
+                   border=5, color_start=(0, 255, 0), color_finish=(255, 0, 0)):  
     width = (len(matrix) // 2 + 1) * width_line + (len(matrix) // 2) * width_walls + border * 2
     height = (len(matrix[0]) // 2 + 1) * width_line + (len(matrix[0]) // 2) * width_walls + border * 2
     for i in range(width):
@@ -121,7 +114,6 @@ def draw_labyrinth(matrix, start, finish, width_line=20, width_walls=5, color_wa
 
 
 def delete_player():
-    """Функция удаления игрока при движении и оставления следов"""
     if (player[0], player[1]) == start:
         pygame.draw.circle(window, color_start, (border + player[0] * (width_line + width_walls) + width_line // 2,
                                                  border + player[1] * (width_line + width_walls) + width_line // 2),
@@ -137,20 +129,17 @@ def delete_player():
 
 
 def draw_player():
-    """Отрисовка игрока на экране"""
     pygame.draw.circle(window, color_player, (border + player[0] * (width_line + width_walls) + width_line // 2,
                                               border + player[1] * (width_line + width_walls) + width_line // 2),
                        width_line // 2 - 3)
 
 
 def tick():
-    """Cекудномер"""
     global start_time, t
     t = time.time() - start_time
 
 
 def click_RIGHT(m):
-    """Движение вправо"""
     global player
     if len(m) > player[0] * 2 + 2:
         if m[player[0] * 2 + 1][player[1] * 2]:
@@ -158,7 +147,6 @@ def click_RIGHT(m):
 
 
 def click_LEFT(m):
-    """Движение влево"""
     global player
     if -1 < player[0] * 2 - 2:
         if m[player[0] * 2 - 1][player[1] * 2]:
@@ -166,7 +154,6 @@ def click_LEFT(m):
 
 
 def click_DOWN(m):
-    """Движение вниз"""
     global player
     if len(m[0]) > player[1] * 2 + 2:
         if m[player[0] * 2][player[1] * 2 + 1]:
@@ -174,7 +161,6 @@ def click_DOWN(m):
 
 
 def click_UP(m):
-    """Движение вверх"""
     global player
     if -1 < player[1] * 2 - 2:
         if m[player[0] * 2][player[1] * 2 - 1]:
@@ -182,18 +168,24 @@ def click_UP(m):
 
 
 def setting_trace():
-    """Изменение флага оставления следов"""
     global trace
-    global color_wall
     if trace:
         trace = False
-        color_wall=(255,255,255)
     else:
         trace = True
+
+def invisibility():
+    global color_wall
+    if color_wall:
         color_wall = (255,255,255)
 
+def unvisibility():
+    global color_wall
+    if color_wall:
+        color_wall = (0,0,255)
+
 def new_game():
-    global record_time, start_time, player, matrix, start, finish, matrix_base
+    global record_time, start_time, player, matrix, start, finish, matrix_base, color_wall,t
     window.fill((0, 0, 0))
     start_time = time.time()+10
     pygame.draw.rect(window, (0, 0, 0), (0, height_window - 70, width_window, 70))
@@ -211,9 +203,9 @@ def new_game():
                    color_wall,
                    border, color_start, color_finish)
     draw_player()
+    
 
 
-"""Системные переменные"""
 border = 5
 width_line = 40
 width_walls = 10
@@ -265,7 +257,7 @@ while flag_game:  # основной игровой цикл
     if tuple(player) == finish:
         window.fill((0, 0, 0))
         score += 1
-        if score ==3:
+        if score ==6:
             break
         if t < record_time:
             record_time = t
@@ -301,6 +293,10 @@ while flag_game:  # основной игровой цикл
                 click_DOWN(matrix)
             if event.key == pygame.K_p:
                 pass
+            if event.key == pygame.K_t:
+                invisibility()
+            if event.key == pygame.K_y:
+                unvisibility()
             if event.key == pygame.K_q:
                 setting_trace()
             if event.key == pygame.K_r:
@@ -323,6 +319,8 @@ while flag_game:  # основной игровой цикл
     draw_player()
     tick()
     pygame.display.update()
+
+
 with open('results.txt', 'a') as fp:
     for item in t_len:
         fp.write("%s\n" % item)
