@@ -294,9 +294,13 @@ while flag_game:  # основной игровой цикл
             if event.key == pygame.K_p:
                 pass
             if event.key == pygame.K_t:
-                invisibility()
+                draw_labyrinth(matrix, start, finish, width_line, width_walls, color_way=(255,255,255),
+                color_wall=(255,255,255),
+                border=5, color_start=(0, 255, 0), color_finish=(255, 0, 0))
             if event.key == pygame.K_y:
-                unvisibility()
+                draw_labyrinth(matrix, start, finish, width_line, width_walls, color_way=(255,255,255),
+                color_wall=(0,0,255),
+                border=5, color_start=(0, 255, 0), color_finish=(255, 0, 0))
             if event.key == pygame.K_q:
                 setting_trace()
             if event.key == pygame.K_r:
